@@ -6,7 +6,7 @@ use Carbon_Fields\Field\Field;
 
 class Code_Editor_Field extends Field
 {
-	protected $language = 'htmlmixed';
+	protected $language = 'php';
 	protected $indent_unit = 4;
 	protected $tab_size = 4;
 
@@ -41,26 +41,32 @@ class Code_Editor_Field extends Field
 		$root_uri = \Carbon_Fields\Carbon_Fields::directory_to_url(\Carbon_Field_Code_Editor\DIR);
 
 		// Enqueue field styles.
-		wp_enqueue_style('carbon-field-code-editor', $root_uri . '/build/bundle.css');
-
-		// Enqueue field scripts.
-		wp_enqueue_script('carbon-field-code-editor', $root_uri . '/build/bundle.js', ['carbon-fields-core']);
-
-		// Enqueue CodeMirror theme CSS
 		wp_enqueue_style(
-			'codemirror-theme-monokai',
-			includes_url( 'js/codemirror/theme/monokai.css' ),
-			['wp-codemirror']
+			'carbon-field-code-editor',
+			$root_uri . '/build/bundle' . ((defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min') . '.css'
 		);
 
-		// Enqueue CodeMirror settings
-		$settings = wp_enqueue_code_editor(['type' => 'text/plain']);
+		// Enqueue field scripts.
+		wp_enqueue_script(
+			'carbon-field-code-editor',
+			$root_uri . '/build/bundle' . ((defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min') . '.js',
+			['carbon-fields-core']
+		);
+
+		// // Enqueue CodeMirror settings
+		$settings = wp_enqueue_code_editor(
+			[
+				'type' => 'text/plain',
+				'codemirror' => [
+					'lint'    => true,
+					'gutters' => ['CodeMirror-lint-markers'],
+				],
+			]
+		);
 
 		if (false === $settings) {
 			$settings = ['codemirror' => []];
 		}
-
-		$settings['codemirror']['theme'] = 'monokai';
 
 		wp_localize_script('carbon-field-code-editor', 'codeEditorSettings', $settings);
 	}
@@ -70,43 +76,54 @@ class Code_Editor_Field extends Field
 	 */
 	public function to_json($load)
 	{
-		parent::to_json($load);
-		$this->json['value']       = $this->get_value();
-		$this->json['language']    = $this->language;
-		$this->json['indent_unit'] = $this->indent_unit;
-		$this->json['tab_size']    = $this->tab_size;
+		$field_data = parent::to_json($load);
+
+		$field_data = array_merge($field_data, [
+			'language' => $this->language,
+			'indent_unit' => $this->indent_unit,
+			'tab_size' => $this->tab_size,
+		]);
+
+		return $field_data;
 	}
 
-	/**
-	 * Set the language mode for CodeMirror.
-	 *
-	 * @param string $language
-	 * @return $this
-	 */
+	public function get_formatted_value()
+	{
+		$value = $this->get_value();
+
+		return $value;
+	}
+
+	// /**
+	//  * Set the language mode for CodeMirror.
+	//  *
+	//  * @param string $language
+	//  * @return $this
+	//  */
 	public function set_language($language)
 	{
 		$this->language = $language;
 		return $this;
 	}
 
-	/**
-	 * Set the indent unit for CodeMirror.
-	 *
-	 * @param int $indent_unit
-	 * @return $this
-	 */
+	// /**
+	//  * Set the indent unit for CodeMirror.
+	//  *
+	//  * @param int $indent_unit
+	//  * @return $this
+	//  */
 	public function set_indent_unit($indent_unit)
 	{
 		$this->indent_unit = $indent_unit;
 		return $this;
 	}
 
-	/**
-	 * Set the tab size for CodeMirror.
-	 *
-	 * @param int $tab_size
-	 * @return $this
-	 */
+	// /**
+	//  * Set the tab size for CodeMirror.
+	//  *
+	//  * @param int $tab_size
+	//  * @return $this
+	//  */
 	public function set_tab_size($tab_size)
 	{
 		$this->tab_size = $tab_size;

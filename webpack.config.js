@@ -55,22 +55,27 @@ module.exports = {
 			},
 		],
 	},
-	externals: {
-		'@wordpress/compose': 'cf.vendor["@wordpress/compose"]',
-		'@wordpress/data': 'cf.vendor["@wordpress/data"]',
-		'@wordpress/element': 'cf.vendor["@wordpress/element"]',
-		'@wordpress/hooks': 'cf.vendor["@wordpress/hooks"]',
-		'@wordpress/i18n': 'cf.vendor["@wordpress/i18n"]',
-		'classnames': 'cf.vendor["classnames"]',
-		'lodash': 'cf.vendor["lodash"]',
-		'@carbon-fields/core': 'cf.core',
-	},
+	externals: [
+		'@wordpress/compose',
+		'@wordpress/data',
+		'@wordpress/element',
+		'@wordpress/hooks',
+		'@wordpress/i18n',
+		'classnames',
+		'lodash'
+	].reduce((memo, name) => {
+		memo[name] = `cf.vendor['${name}']`;
+
+		return memo;
+	}, {
+		'@carbon-fields/core': 'cf.core'
+	}),
 	plugins: [
 		new MiniCssExtractPlugin({
 			filename: isProduction ? '[name].min.css' : '[name].css',
 		}),
 		new ProvidePlugin({
-			wp: ['@wordpress/element', 'default'],
+			'wp.element': '@wordpress/element'
 		}),
 	],
 	optimization: {
