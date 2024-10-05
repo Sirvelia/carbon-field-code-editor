@@ -1,0 +1,25 @@
+{
+    "name": "sirvelia/carbon-field-code-editor",
+    "description": "Carbon Fields extension, that adds a code editor field type.",
+    "keywords": ["wordpress", "carbon-field", "carbon-field-code-editor"],
+    "homepage": "https://github.com/sirvelia/carbon-field-code-editor",
+    "type": "library",
+    "license": "GPL-3.0+",
+    "authors": [
+      {
+        "name": "Joan Rodas Cusidó",
+        "email": "joan@sirvelia.com",
+        "homepage": "https://sirvelia.com",
+        "role": "Developer"
+      }
+    ],
+    "require": {},
+    "autoload": {
+        "files": [
+            "field.php"
+        ],
+        "psr-4": {
+            "Carbon_Field_Code_Editor\\": "core/"
+        }
+    }
+}
